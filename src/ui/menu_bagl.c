@@ -23,8 +23,24 @@
 
 #include "../globals.h"
 #include "menu.h"
+#include "../penumbra_bip44.h"
 
-UX_STEP_NOCB(ux_menu_ready_step, pnn, {&C_app_boilerplate_16px, "Boilerplate", "is ready"});
+static const char HEXDIGITS[] = "0123456789abcdef";
+
+void array_hexstr(char *strbuf, const void *bin, unsigned int len) {
+    while (len--) {
+        *strbuf++ = HEXDIGITS[((*((char *) bin)) >> 4) & 0xF];
+        *strbuf++ = HEXDIGITS[(*((char *) bin)) & 0xF];
+        bin = (const void *) ((unsigned int) bin + 1);
+    }
+    *strbuf = 0;  // EOS
+}
+
+static uint8_t spend_key_bytes[64];
+static char spend_key_hex[65];
+
+UX_STEP_NOCB(ux_menu_ready_step, pnn, {&C_app_boilerplate_16px, "Boilerplate", "is Penumbra"});
+UX_STEP_NOCB(ux_menu_spend_key_step, bnnn_paging, {"Spend Key Bytes", spend_key_hex});
 UX_STEP_NOCB(ux_menu_version_step, bn, {"Version", APPVERSION});
 UX_STEP_CB(ux_menu_about_step, pb, ui_menu_about(), {&C_icon_certificate, "About"});
 UX_STEP_VALID(ux_menu_exit_step, pb, os_sched_exit(-1), {&C_icon_dashboard_x, "Quit"});
@@ -36,6 +52,7 @@ UX_STEP_VALID(ux_menu_exit_step, pb, os_sched_exit(-1), {&C_icon_dashboard_x, "Q
 // #4 screen: quit
 UX_FLOW(ux_menu_main_flow,
         &ux_menu_ready_step,
+        &ux_menu_spend_key_step,
         &ux_menu_version_step,
         &ux_menu_about_step,
         &ux_menu_exit_step,
@@ -45,6 +62,9 @@ void ui_menu_main() {
     if (G_ux.stack_count == 0) {
         ux_stack_push();
     }
+
+    compute_spend_key_bytes(0, spend_key_bytes);
+    array_hexstr(spend_key_hex, spend_key_bytes, 32);
 
     ux_flow_init(0, ux_menu_main_flow, NULL);
 }

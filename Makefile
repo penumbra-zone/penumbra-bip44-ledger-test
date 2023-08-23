@@ -25,12 +25,12 @@ include $(BOLOS_SDK)/Makefile.defines
 #        Mandatory configuration       #
 ########################################
 # Application name
-APPNAME = "Boilerplate"
+APPNAME = "Penumbra BIP44Test"
 
 # Application version
-APPVERSION_M = 2
+APPVERSION_M = 0
 APPVERSION_N = 0
-APPVERSION_P = 0
+APPVERSION_P = 1
 APPVERSION = "$(APPVERSION_M).$(APPVERSION_N).$(APPVERSION_P)"
 
 # Application source files
@@ -56,7 +56,11 @@ CURVE_APP_LOAD_PARAMS = secp256k1
 # and SLIP-0044 standards.
 # If your app needs it, you can specify multiple path by using:
 # `PATH_APP_LOAD_PARAMS = "44'/1'" "45'/1'"`
-PATH_APP_LOAD_PARAMS = "44'/1'"   # purpose=coin(44) / coin_type=Testnet(1)
+PATH_APP_LOAD_PARAMS = "44'/6532'"   # purpose=coin(44) / coin_type=Penumbra
+
+# Copied from makefile include in ethereum app
+#APP_LOAD_PARAMS += --path "44'/6532'"
+#DEFINES += CHAINID_UPCASE=\"PENUMBRA\" CHAINID_COINNAME=\"UM\" CHAIN_KIND=CHAIN_KIND_PENUMBRA 
 
 # Setting to allow building variant applications
 # - <VARIANT_PARAM> is the name of the parameter which should be set
